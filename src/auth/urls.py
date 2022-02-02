@@ -43,38 +43,15 @@ async def route_login(form_data: LoginSchema):
 @router.post('/register')
 def route_register(form_data: LoginSchema):
     data = form_data.dict()
-
     user = register_user(**data)
     print(user.login)
     return TokenData(login=user.login).json()
 
 
-# @router.post("/register", response_model=Token)
-# async def route_register(form_data: LoginSchema):
-#     user = authenticate_user(fake_users_db, form_data.login, form_data.password)
-#     if not user:
-#         raise HTTPException(status_code=400, detail="Incorrect login or password")
-#     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = create_access_token(
-#         data={"sub": user.login}, expires_delta=access_token_expires
-#     )
-#     # return {"access_token": access_token, "token_type": "bearer"}
-#     response = Response('Hello')
-#     response.set_cookie(
-#             "Authorization",
-#             value=f"Bearer {access_token}",
-#             # domain="localtest.me",
-#             httponly=True,
-#             # max_age=1800,
-#             # expires=1800,
-#         )
-#     return response
-
-
 @router.get("/logout")
 async def route_logout_and_remove_cookie():
-    response = RedirectResponse(url="/")
-    response.delete_cookie("Authorization", domain="localtest.me")
+    response = Response('You have been successfully logged out')
+    response.delete_cookie("Authorization")
     return response
 
 
