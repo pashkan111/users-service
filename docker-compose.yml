@@ -5,10 +5,9 @@ services:
     image: postgres:13
     restart: always
     environment:
-      - POSTGRES_HOST=pdb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - POSTGRES_NAME=users
+      - POSTGRES_DB=users
     volumes:
       - ./volumes/postgresql/pg-data:/var/lib/postgresql/data
     ports:
