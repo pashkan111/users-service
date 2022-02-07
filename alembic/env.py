@@ -6,7 +6,6 @@ from sqlalchemy import pool
 # from src.users.models import Base as UsersBase
 
 from src.auth.models import AuthUser
-from src.users.models import Users
 from db.db import Base
 from alembic import context
 
