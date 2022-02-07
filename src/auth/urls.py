@@ -22,17 +22,17 @@ router = APIRouter()
 
 
 @router.post("/login")
-# @router.post("/register", response_model=Token)
-async def route_login(form_data: LoginSchema):
-    user = authenticate_user(form_data.login, form_data.password)
+async def route_login(data: LoginSchema):
+    """Route for login user"""
+    
+    user = authenticate_user(data)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect login or password")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.login}, expires_delta=access_token_expires
+        data={"login": user.login}, expires_delta=access_token_expires
     )
-    # return {"access_token": access_token, "token_type": "bearer"}
-    response = Response('You have been successfully registered')
+    response = Response()
     response.set_cookie(
             "Authorization",
             value=f"Bearer {access_token}",
