@@ -9,26 +9,18 @@ from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from passlib.context import CryptContext
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
-from .schemas import LoginSchema, TokenData, UserInDB
+from .schemas import LoginSchema, TokenData, UserInDB, LoginSchemaORM
 # from configs import (
 #     SECRET_KEY,
 #     ALGORITHM,
 #     ACCESS_TOKEN_EXPIRE_MINUTES
 # )
+from .models import AuthUser
+
 
 SECRET_KEY='09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7'
 ALGORITHM='HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-fake_users_db = {
-    "johndoe": {
-        "login": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "password": '123',
-        "disabled": False,
-    }
-}
 
 
 class OAuth2PasswordBearerCookie(OAuth2):
@@ -71,9 +63,9 @@ class OAuth2PasswordBearerCookie(OAuth2):
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def verify_password(plain_password, hashed_password):
-    return True if plain_password == hashed_password else False
-    # return pwd_context.verify(plain_password, hashed_password)
+def verify_password(password, hashed_password):
+    print()
+    return pwd_context.verify(password, hashed_password)
 
 
 def get_password_hash(password):
@@ -86,19 +78,19 @@ async def get_current_user(token: str = Depends(OAuth2PasswordBearerCookie())):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        login: str = payload.get("sub")
+        login: str = payload.get("login")
         if login is None:
             raise credentials_exception
         token_data = TokenData(login=login)
     except PyJWTError:
         raise credentials_exception
-    user = get_user(fake_users_db, login=token_data.login)
+    user = get_user(login=token_data.login)
     if user is None:
-        raise credentials_exception
+        return {"message": "invalid credentials"}
     return user
 
 
-def create_access_token(*, data: dict, expires_delta: timedelta = None):
+def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -110,25 +102,28 @@ def create_access_token(*, data: dict, expires_delta: timedelta = None):
 
 
 def get_user(login: str):
-    if login in fake_users_db:
-        user_dict = fake_users_db[login]
-        return LoginSchema(**user_dict)
+    user = AuthUser.find_user(login)
+    if user:
+        return LoginSchemaORM.from_orm(user)
 
 
-def authenticate_user(login: str, password: str):
+def authenticate_user(data: LoginSchema) -> LoginSchemaORM:
     "Checks if user exists in db"
-    user = get_user(login)
+    user = get_user(data.login)
     if not user:
         return False
-    if not verify_password(password, user.password):
-    # if not verify_password(password, user.hashed_password):
+    if not verify_password(data.password, user.password):
         return False
     return user
 
 
-def register_user(login: str, password: str):
-    user = authenticate_user(login, password)
+def register_user(data: LoginSchema):
+    user = authenticate_user(data)
     if user:
-        return user
-    fake_users_db[login] = {'login': login, 'password': password}
-    return get_user(login) 
+        return None
+    hashed_password = get_password_hash(data.password)
+    data_with_hashed_password = LoginSchema(
+        login=data.login, password=hashed_password
+    )
+    user = AuthUser.create_user(data_with_hashed_password)
+    return user
