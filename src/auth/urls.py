@@ -40,12 +40,15 @@ async def route_login(form_data: LoginSchema):
         )
     return response
 
+
 @router.post('/register')
-def route_register(form_data: LoginSchema):
-    data = form_data.dict()
-    user = register_user(**data)
-    print(user.login)
-    return TokenData(login=user.login).json()
+def route_register(data: LoginSchema):
+    """Route for register users"""
+    
+    user = register_user(data)
+    if user:
+        return {"login": user.login}
+    return {"message": "user with such login already exists"}
 
 
 @router.get("/logout")
