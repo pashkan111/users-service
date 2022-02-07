@@ -64,7 +64,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(password, hashed_password):
-    print()
     return pwd_context.verify(password, hashed_password)
 
 
