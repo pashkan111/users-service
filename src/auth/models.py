@@ -1,5 +1,7 @@
 from db.db import Base
 import sqlalchemy as sa
+from db.db import session
+from .schemas import LoginSchema
 
 
 class AuthUser(Base):
@@ -15,3 +17,16 @@ class AuthUser(Base):
     phone = sa.Column(sa.String(12))
     birthday = sa.Column(sa.DateTime(timezone=True))
     is_admin = sa.Column(sa.Boolean(), default=False)
+    
+
+    @classmethod
+    def create_user(cls, data: LoginSchema):
+        user = cls(login=data.login, password=data.password)
+        session.add(user)
+        session.commit()
+        return user
+    
+    @classmethod
+    def find_user(cls, login: str):
+        user = session.query(cls).filter(cls.login==login).first()
+        return user
