@@ -9,7 +9,7 @@ from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from passlib.context import CryptContext
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
-from .schemas import LoginSchema, TokenData, UserInDB, LoginSchemaORM
+from .schemas import LoginSchema, TokenData, LoginSchemaORM
 # from configs import (
 #     SECRET_KEY,
 #     ALGORITHM,
@@ -86,7 +86,7 @@ async def get_current_user(token: str = Depends(OAuth2PasswordBearerCookie())):
     user = get_user(login=token_data.login)
     if user is None:
         return {"message": "invalid credentials"}
-    return user
+    return user 
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):

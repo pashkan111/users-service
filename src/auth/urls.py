@@ -7,10 +7,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.responses import RedirectResponse, Response, JSONResponse
 from starlette.requests import Request
-from .schemas import LoginSchema, User, TokenData
+from .schemas import LoginSchema, UserSchema, TokenData
 from .auth_backend import (
     authenticate_user, 
-    fake_users_db, 
     ACCESS_TOKEN_EXPIRE_MINUTES,
     create_access_token,
     get_current_user,
@@ -59,8 +58,7 @@ async def route_logout_and_remove_cookie():
 
 
 @router.get("/users/me/")
-# @router.get("/users/me/", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_user)):
+async def read_users_me(current_user: UserSchema = Depends(get_current_user)):
     return current_user
 
 

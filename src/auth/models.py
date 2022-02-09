@@ -15,7 +15,7 @@ class AuthUser(Base):
     other_name = sa.Column(sa.String(50), nullable=True)
     email = sa.Column(sa.String(50), nullable=True)
     phone = sa.Column(sa.String(12), nullable=True)
-    birthday = sa.Column(sa.DateTime(timezone=True), nullable=True)
+    birthday = sa.Column(sa.Date, nullable=True)
     is_admin = sa.Column(sa.Boolean(), default=False)
     
 

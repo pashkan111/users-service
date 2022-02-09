@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+import datetime 
 
 
 class LoginSchema(BaseModel):
@@ -9,23 +10,17 @@ class LoginSchema(BaseModel):
 class LoginSchemaORM(LoginSchema):
     class Config:
         orm_mode = True
-    
-    
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
 
 class TokenData(BaseModel):
     login: str
 
 
-class User(BaseModel):
-    login: str = None
+class UserSchema(BaseModel):
+    first_name: str = None
+    last_name: str = None
+    other_name: str = None
     email: str = None
-    full_name: str = None
-    disabled: bool = None
-
-
-class UserInDB(User):
-    password: str
+    phone: str = None
+    birthday: datetime.date = None
+    is_admin: bool = None
