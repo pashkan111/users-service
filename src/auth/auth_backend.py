@@ -9,7 +9,9 @@ from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from passlib.context import CryptContext
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
-from .schemas import LoginSchema, TokenData, LoginSchemaORM
+from .schemas import (
+    LoginSchema, TokenData, LoginSchemaORM, UserSchemaORM, UserSchema
+    )
 # from configs import (
 #     SECRET_KEY,
 #     ALGORITHM,
@@ -41,7 +43,6 @@ class OAuth2PasswordBearerCookie(OAuth2):
         cookie_scheme, cookie_param = get_authorization_scheme_param(
             cookie_authorization
         )
-        print(cookie_scheme, cookie_param)
 
         if cookie_scheme.lower() == "bearer":
             authorization = True
@@ -71,7 +72,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def get_current_user(token: str = Depends(OAuth2PasswordBearerCookie())):
+async def get_current_user(token: str = Depends(OAuth2PasswordBearerCookie())) -> LoginSchema:
     credentials_exception = HTTPException(
         status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
     )
@@ -89,6 +90,12 @@ async def get_current_user(token: str = Depends(OAuth2PasswordBearerCookie())):
     return user 
 
 
+def get_full_user_info(login: str):
+    user_from_db = AuthUser.find_user(login)
+    if user_from_db:
+        return UserSchemaORM.from_orm(user_from_db)
+    
+
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
@@ -100,11 +107,11 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def get_user(login: str):
+def get_user(login: str) -> LoginSchema:
     user = AuthUser.find_user(login)
     if user:
         return LoginSchemaORM.from_orm(user)
-
+    
 
 def authenticate_user(data: LoginSchema) -> LoginSchemaORM:
     "Checks if user exists in db"

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter
 from pydantic import BaseModel
 from fastapi import Depends, FastAPI, HTTPException
-from starlette.status import HTTP_403_FORBIDDEN
+from starlette import status
 from starlette.responses import RedirectResponse, Response, JSONResponse
 from starlette.requests import Request
 from .schemas import LoginSchema, UserSchema, TokenData
@@ -14,6 +14,7 @@ from .auth_backend import (
     create_access_token,
     get_current_user,
     register_user,
+    get_full_user_info
     )
 
 
@@ -57,12 +58,12 @@ async def route_logout_and_remove_cookie():
     return response
 
 
-@router.get("/users/me/")
-async def read_users_me(current_user: UserSchema = Depends(get_current_user)):
-    return current_user
+@router.get("/users/current/")
+async def read_users_me(response: Response, current_user: UserSchema = Depends(get_current_user)):
+    user = get_full_user_info(current_user.login)
+    if user:
+        response.status_code = status.HTTP_200_OK
+        return user
+    response.status_code = status.HTTP_400_BAD_REQUEST
 
-
-# @router.get("/users/me/items/")
-# async def read_own_items(current_user: User = Depends(get_current_active_user)):
-#     return [{"item_id": "Foo", "owner": current_user.login}]
 

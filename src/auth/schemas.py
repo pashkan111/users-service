@@ -24,3 +24,8 @@ class UserSchema(BaseModel):
     phone: str = None
     birthday: datetime.date = None
     is_admin: bool = None
+
+
+class UserSchemaORM(UserSchema):
+    class Config:
+        orm_mode = True
