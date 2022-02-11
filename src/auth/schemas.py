@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import datetime 
+from typing import List
 
 
 class LoginSchema(BaseModel):
@@ -27,5 +28,19 @@ class UserSchema(BaseModel):
 
 
 class UserSchemaORM(UserSchema):
+    class Config:
+        orm_mode = True
+        
+
+class UsersListSchema(BaseModel):
+    id: int = None
+    first_name: str = None
+    last_name: str = None
+    email: str = None
+
+
+class UsersListSchemaORM(UsersListSchema):
+# class UsersListSchemaORM(UsersListSchema):
+    # users: List[UsersListSchema] = []
     class Config:
         orm_mode = True

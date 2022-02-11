@@ -7,7 +7,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from starlette import status
 from starlette.responses import RedirectResponse, Response, JSONResponse
 from starlette.requests import Request
-from .schemas import LoginSchema, UserSchema, TokenData
+from .schemas import (
+    LoginSchema, UserSchema, UsersListSchema
+    )
 from .auth_backend import (
     authenticate_user, 
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -16,6 +18,7 @@ from .auth_backend import (
     register_user,
     get_full_user_info
     )
+from .services import get_users_from_db
 
 
 router = APIRouter()
@@ -59,7 +62,9 @@ async def route_logout_and_remove_cookie():
 
 
 @router.get("/users/current/")
-async def read_users_me(response: Response, current_user: UserSchema = Depends(get_current_user)):
+async def read_users_me(response: Response, request: Request,  current_user: UserSchema = Depends(get_current_user)):
+    from pprint import pprint
+    pprint(request.__dict__)
     user = get_full_user_info(current_user.login)
     if user:
         response.status_code = status.HTTP_200_OK
@@ -67,3 +72,7 @@ async def read_users_me(response: Response, current_user: UserSchema = Depends(g
     response.status_code = status.HTTP_400_BAD_REQUEST
 
 
+@router.get('/users')
+def route_get_users():
+    return get_users_from_db()
+    
