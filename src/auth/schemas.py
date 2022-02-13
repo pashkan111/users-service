@@ -86,13 +86,13 @@ class PrivateCreateUserSchemaORM(PrivateCreateUserSchema):
 class PrivateDetailUserResponseModelORM(BaseModel):
     id: int
     login: str
-    first_name: str
-    last_name: str
-    email: str
-    is_admin: bool
-    other_name: str
-    phone: str
-    birthday: datetime.date
+    first_name: str = None
+    last_name: str = None
+    email: str = None
+    is_admin: bool = None
+    other_name: str = None
+    phone: str = None
+    birthday: datetime.date = None
     
     class Config:
         orm_mode = True
