@@ -1,3 +1,4 @@
+from codecs import strict_errors
 from pydantic import BaseModel
 import datetime 
 from typing import List
@@ -44,3 +45,22 @@ class UsersListSchemaORM(UsersListSchema):
     # users: List[UsersListSchema] = []
     class Config:
         orm_mode = True
+        
+
+class UpdateUserModel(BaseModel):
+    first_name: str
+    last_name: str
+    other_name: str
+    email: str
+    phone: str
+    birthday: datetime.date
+    
+    
+class UpdateUserResponseModel(UpdateUserModel):
+    id: int
+    
+    
+class UpdateUserResponseModelORM(UpdateUserResponseModel):
+    class Config:
+        orm_mode = True    
+    

@@ -8,7 +8,7 @@ from starlette import status
 from starlette.responses import RedirectResponse, Response, JSONResponse
 from starlette.requests import Request
 from .schemas import (
-    LoginSchema, UserSchema, UsersListSchema
+    LoginSchema, UserSchema, UsersListSchema, UpdateUserModel, UpdateUserResponseModelORM
     )
 from .auth_backend import (
     authenticate_user, 
@@ -19,7 +19,7 @@ from .auth_backend import (
     get_full_user_info
     )
 from fastapi_pagination import Page, add_pagination, paginate
-from .services import get_users_from_db
+from .services import get_users_from_db, update_user
 
 
 router = APIRouter()
@@ -77,6 +77,12 @@ def route_get_users(response: Response, current_user: UserSchema = Depends(get_c
     response.status_code = status.HTTP_200_OK
     return paginate(users)
     
-    
+
+@router.patch('/users/{pk}')
+def route_update_user(pk: int, data: UpdateUserModel):
+    user = update_user(pk, data)
+    return UpdateUserResponseModelORM.from_orm(user)
+
+
 add_pagination(router)
 

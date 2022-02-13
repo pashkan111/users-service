@@ -1,7 +1,9 @@
 from db.db import session
 from .models import AuthUser
-from .schemas import UsersListSchemaORM
+from .schemas import UsersListSchemaORM, UpdateUserModel
 from typing import List
+from fastapi import Depends, HTTPException
+from starlette import status 
 
     
 def get_serialized_users(users: List[AuthUser]) -> List[UsersListSchemaORM]:
@@ -17,4 +19,17 @@ def get_users_from_db():
     return get_serialized_users(users)
     
     
+def update_user(pk: int, data: UpdateUserModel):
+    user = session.query(AuthUser).filter(AuthUser.id==pk).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='User has not been found'
+        )
+    for field, value in data.dict().items():
+        setattr(user, field, value)
+    
+    session.add(user)
+    session.commit()
+    return user
     
