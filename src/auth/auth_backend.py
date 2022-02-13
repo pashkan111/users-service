@@ -87,7 +87,12 @@ async def get_current_user(token: str = Depends(OAuth2PasswordBearerCookie())) -
     user = get_user(login=token_data.login)
     if user is None:
         return {"message": "invalid credentials"}
-    return user 
+    return user
+
+
+def check_user_permission(user: LoginSchema) -> bool:
+    checking_user = AuthUser.find_user(user.login)
+    return checking_user.is_admin
 
 
 def get_full_user_info(login: str):
