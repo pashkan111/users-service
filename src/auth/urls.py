@@ -79,10 +79,10 @@ def route_get_users(response: Response, current_user: LoginSchema = Depends(get_
     return paginate(users)
     
 
-@router.patch('/users/{pk}')
-def route_update_user(pk: int, data: UpdateUserModel, response: Response):
+@router.patch('/users')
+def route_update_user(data: UpdateUserModel, response: Response, current_user: LoginSchema = Depends(get_current_user)):
     try:
-        user = update_user(pk, data)
+        user = update_user(current_user.login, data)
     except HTTPException as e:
         response.status_code = e.status_code
         return e.detail

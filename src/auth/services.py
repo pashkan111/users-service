@@ -19,8 +19,8 @@ def get_users_from_db():
     return get_serialized_users(users)
     
     
-def update_user(pk: int, data: UpdateUserModel):
-    user = session.query(AuthUser).filter(AuthUser.id==pk).first()
+def update_user(login:str, data: UpdateUserModel):
+    user = session.query(AuthUser).filter(AuthUser.login==login).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
