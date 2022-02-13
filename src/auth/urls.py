@@ -16,7 +16,8 @@ from .auth_backend import (
     create_access_token,
     get_current_user,
     register_user,
-    get_full_user_info
+    get_full_user_info,
+    check_user_permission
     )
 from fastapi_pagination import Page, add_pagination, paginate
 from .services import get_users_from_db, update_user
@@ -87,6 +88,17 @@ def route_update_user(data: UpdateUserModel, response: Response, current_user: L
         response.status_code = e.status_code
         return e.detail
     return UpdateUserResponseModelORM.from_orm(user)
+
+
+@router.patch('/private/users')
+def private_route_users(response: Response, current_user: LoginSchema = Depends(get_current_user)):
+    is_admin = check_user_permission(current_user)
+    if is_admin:
+        users = get_users_from_db()
+        response.status_code = status.HTTP_200_OK
+        return paginate(users)
+    response.status_code = status.HTTP_403_FORBIDDEN()
+    return 'Only for private users'
 
 
 add_pagination(router)
