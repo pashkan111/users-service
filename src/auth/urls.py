@@ -20,7 +20,9 @@ from .auth_backend import (
     check_user_permission
     )
 from fastapi_pagination import Page, add_pagination, paginate
-from .services import get_users_from_db, update_user, create_user
+from .services import (
+    get_users_from_db, update_user, create_user, get_user_by_id
+    )
 from fastapi import HTTPException
 
 
@@ -104,7 +106,6 @@ def private_route_users(response: Response, current_user: LoginSchema = Depends(
 @router.post('/private/users')
 def private_route_create_user(response: Response, data: PrivateCreateUserSchema, current_user: LoginSchema = Depends(get_current_user)):
     is_admin = check_user_permission(current_user)
-    print(data)
     if is_admin:
         user = create_user(data)
         response.status_code = status.HTTP_201_CREATED
@@ -113,7 +114,17 @@ def private_route_create_user(response: Response, data: PrivateCreateUserSchema,
     return 'Only for private users'
 
 
-
+@router.get('/private/users/{id}')
+def private_route_get_user(id: int, response: Response, current_user: LoginSchema = Depends(get_current_user)):
+    is_admin = check_user_permission(current_user)
+    if is_admin:
+        try:
+            user = get_user_by_id(id)
+            return user
+        except HTTPException as e:
+            response.status_code = e.status_code
+            return e.detail
+        
 
 
 add_pagination(router)
