@@ -47,3 +47,24 @@ def get_user_by_id(id: int) -> PrivateDetailUserResponseModelORM:
             detail='User has not been found'
         )
     return PrivateDetailUserResponseModelORM.from_orm(user)
+
+
+def update_user_by_id(id: int) -> PrivateDetailUserResponseModelORM:
+    user = session.query(AuthUser).filter(AuthUser.id==id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='User has not been found'
+        )
+    return PrivateDetailUserResponseModelORM.from_orm(user)
+
+
+def delete_user_by_id(id: int) -> None:
+    user = session.query(AuthUser).filter(AuthUser.id==id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='User has not been found'
+        ) 
+    session.delete(user)
+    session.commit()
