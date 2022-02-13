@@ -18,6 +18,7 @@ from .auth_backend import (
     register_user,
     get_full_user_info
     )
+from fastapi_pagination import Page, add_pagination, paginate
 from .services import get_users_from_db
 
 
@@ -63,8 +64,6 @@ async def route_logout_and_remove_cookie():
 
 @router.get("/users/current/")
 async def read_users_me(response: Response, request: Request,  current_user: UserSchema = Depends(get_current_user)):
-    from pprint import pprint
-    pprint(request.__dict__)
     user = get_full_user_info(current_user.login)
     if user:
         response.status_code = status.HTTP_200_OK
@@ -72,7 +71,12 @@ async def read_users_me(response: Response, request: Request,  current_user: Use
     response.status_code = status.HTTP_400_BAD_REQUEST
 
 
-@router.get('/users')
-def route_get_users():
-    return get_users_from_db()
+@router.get('/users', response_model=Page[UsersListSchema])
+def route_get_users(response: Response, current_user: UserSchema = Depends(get_current_user)):
+    users = get_users_from_db()
+    response.status_code = status.HTTP_200_OK
+    return paginate(users)
     
+    
+add_pagination(router)
+
