@@ -64,7 +64,7 @@ async def route_logout_and_remove_cookie():
 
 
 @router.get("/users/current/")
-async def read_users_me(response: Response, request: Request,  current_user: UserSchema = Depends(get_current_user)):
+async def read_users_me(response: Response, request: Request,  current_user: LoginSchema = Depends(get_current_user)):
     user = get_full_user_info(current_user.login)
     if user:
         response.status_code = status.HTTP_200_OK
@@ -73,7 +73,7 @@ async def read_users_me(response: Response, request: Request,  current_user: Use
 
 
 @router.get('/users', response_model=Page[UsersListSchema])
-def route_get_users(response: Response, current_user: UserSchema = Depends(get_current_user)):
+def route_get_users(response: Response, current_user: LoginSchema = Depends(get_current_user)):
     users = get_users_from_db()
     response.status_code = status.HTTP_200_OK
     return paginate(users)
