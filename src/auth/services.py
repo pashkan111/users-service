@@ -1,6 +1,6 @@
 from db.db import session
 from .models import AuthUser
-from .schemas import UsersListSchemaORM, UpdateUserModel
+from .schemas import UsersListSchemaORM, UpdateUserModel, PrivateCreateUserSchemaORM, PrivateCreateUserSchema
 from typing import List
 from fastapi import Depends, HTTPException
 from starlette import status 
@@ -32,4 +32,9 @@ def update_user(login:str, data: UpdateUserModel):
     session.add(user)
     session.commit()
     return user
+    
+    
+def create_user(data: PrivateCreateUserSchema):
+    user = AuthUser.create_user_with_all_parameters(data)
+    return PrivateCreateUserSchemaORM.from_orm(user)
     

@@ -1,7 +1,7 @@
 from db.db import Base
 import sqlalchemy as sa
 from db.db import session
-from .schemas import LoginSchema
+from .schemas import LoginSchema, PrivateCreateUserSchema
 
 
 class AuthUser(Base):
@@ -29,4 +29,11 @@ class AuthUser(Base):
     @classmethod
     def find_user(cls, login: str):
         user = session.query(cls).filter(cls.login==login).first()
+        return user
+    
+    @classmethod
+    def create_user_with_all_parameters(cls, data: PrivateCreateUserSchema):
+        user = cls(**data.dict())
+        session.add(user)
+        session.commit()
         return user

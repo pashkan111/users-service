@@ -8,7 +8,7 @@ from starlette import status
 from starlette.responses import RedirectResponse, Response, JSONResponse
 from starlette.requests import Request
 from .schemas import (
-    LoginSchema, UserSchema, UsersListSchema, UpdateUserModel, UpdateUserResponseModelORM
+    LoginSchema, UserSchema, UsersListSchema, UpdateUserModel, UpdateUserResponseModelORM, PrivateCreateUserSchema
     )
 from .auth_backend import (
     authenticate_user, 
@@ -20,7 +20,7 @@ from .auth_backend import (
     check_user_permission
     )
 from fastapi_pagination import Page, add_pagination, paginate
-from .services import get_users_from_db, update_user
+from .services import get_users_from_db, update_user, create_user
 from fastapi import HTTPException
 
 
@@ -90,15 +90,30 @@ def route_update_user(data: UpdateUserModel, response: Response, current_user: L
     return UpdateUserResponseModelORM.from_orm(user)
 
 
-@router.patch('/private/users')
+@router.get('/private/users', response_model=Page[UsersListSchema])
 def private_route_users(response: Response, current_user: LoginSchema = Depends(get_current_user)):
     is_admin = check_user_permission(current_user)
     if is_admin:
         users = get_users_from_db()
         response.status_code = status.HTTP_200_OK
         return paginate(users)
-    response.status_code = status.HTTP_403_FORBIDDEN()
+    response.status_code = status.HTTP_403_FORBIDDEN
     return 'Only for private users'
+
+
+@router.post('/private/users')
+def private_route_create_user(response: Response, data: PrivateCreateUserSchema, current_user: LoginSchema = Depends(get_current_user)):
+    is_admin = check_user_permission(current_user)
+    print(data)
+    if is_admin:
+        user = create_user(data)
+        response.status_code = status.HTTP_201_CREATED
+        return user
+    response.status_code = status.HTTP_403_FORBIDDEN
+    return 'Only for private users'
+
+
+
 
 
 add_pagination(router)

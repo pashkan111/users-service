@@ -1,7 +1,7 @@
 from codecs import strict_errors
 from pydantic import BaseModel
 import datetime 
-from typing import List
+from typing import List, Optional
 
 
 class LoginSchema(BaseModel):
@@ -64,3 +64,20 @@ class UpdateUserResponseModelORM(UpdateUserResponseModel):
     class Config:
         orm_mode = True    
     
+    
+class PrivateCreateUserSchema(BaseModel):
+    login: str
+    password: str
+    first_name: str
+    last_name: str
+    email: str
+    is_admin: bool
+    other_name: Optional[str] = None
+    phone: Optional[str] = None
+    birthday: Optional[datetime.date] = None
+    
+    
+class PrivateCreateUserSchemaORM(PrivateCreateUserSchema):
+    id: int
+    class Config:
+        orm_mode = True  
