@@ -21,7 +21,7 @@ from .auth_backend import (
     )
 from fastapi_pagination import Page, add_pagination, paginate
 from .services import (
-    get_users_from_db, update_user, create_user, get_user_by_id, delete_user_by_id
+    get_users_from_db, update_user, create_user, get_user_by_id, delete_user_by_id, update_user_by_id
     )
 from fastapi import HTTPException
 
@@ -141,7 +141,19 @@ def private_route_delete_user(id: int, response: Response, current_user: LoginSc
     response.status_code = status.HTTP_403_FORBIDDEN
     return 'Only for private users' 
 
-        
+
+@router.patch('/private/users/{id}')
+def private_route_update_user(id: int, response: Response, current_user: LoginSchema = Depends(get_current_user)):
+    is_admin = check_user_permission(current_user)
+    if is_admin:
+        try:
+            user = update_user_by_id(id)
+            return user
+        except HTTPException as e:
+            response.status_code = e.status_code
+            return e.detail
+    response.status_code = status.HTTP_403_FORBIDDEN
+    return 'Only for private users' 
     
 
 add_pagination(router)

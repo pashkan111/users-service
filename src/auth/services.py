@@ -1,6 +1,6 @@
 from db.db import session
 from .models import AuthUser
-from .schemas import UsersListSchemaORM, UpdateUserModel, PrivateCreateUserSchemaORM, PrivateCreateUserSchema, PrivateDetailUserResponseModelORM
+from .schemas import UsersListSchemaORM, UpdateUserModel, PrivateCreateUserSchemaORM, PrivateCreateUserSchema, PrivateDetailUserResponseModelORM, PrivateUpdateUserModelORM
 from typing import List
 from fastapi import Depends, HTTPException
 from starlette import status 
@@ -49,14 +49,18 @@ def get_user_by_id(id: int) -> PrivateDetailUserResponseModelORM:
     return PrivateDetailUserResponseModelORM.from_orm(user)
 
 
-def update_user_by_id(id: int) -> PrivateDetailUserResponseModelORM:
+def update_user_by_id(id: int, data: PrivateUpdateUserModelORM) -> PrivateUpdateUserModelORM:
     user = session.query(AuthUser).filter(AuthUser.id==id).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='User has not been found'
         )
-    return PrivateDetailUserResponseModelORM.from_orm(user)
+    for field, value in data.dict().items():
+        setattr(user, field, value)
+    session.add(user)
+    session.commit()
+    return PrivateUpdateUserModelORM.from_orm(user)
 
 
 def delete_user_by_id(id: int) -> None:

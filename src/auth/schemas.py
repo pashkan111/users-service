@@ -95,5 +95,19 @@ class PrivateDetailUserResponseModelORM(BaseModel):
     birthday: datetime.date
     
     class Config:
-        orm_mode = True  
+        orm_mode = True
+        
+        
+class PrivateUpdateUserModelORM(BaseModel):
+    id: int
+    login: str = None
+    first_name: str = None
+    last_name: str = None
+    email: str = None
+    is_admin: bool = None
+    other_name: str = None
+    phone: str = None
+    birthday: datetime.date = None
     
+    class Config:
+        orm_mode = True
