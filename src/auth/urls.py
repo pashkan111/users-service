@@ -124,7 +124,8 @@ def private_route_get_user(id: int, response: Response, current_user: LoginSchem
         except HTTPException as e:
             response.status_code = e.status_code
             return e.detail
-        
+    response.status_code = status.HTTP_403_FORBIDDEN
+    return 'Only for private users'  
 
 
 add_pagination(router)
