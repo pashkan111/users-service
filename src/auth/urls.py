@@ -20,6 +20,7 @@ from .auth_backend import (
     )
 from fastapi_pagination import Page, add_pagination, paginate
 from .services import get_users_from_db, update_user
+from fastapi import HTTPException
 
 
 router = APIRouter()
@@ -79,8 +80,12 @@ def route_get_users(response: Response, current_user: UserSchema = Depends(get_c
     
 
 @router.patch('/users/{pk}')
-def route_update_user(pk: int, data: UpdateUserModel):
-    user = update_user(pk, data)
+def route_update_user(pk: int, data: UpdateUserModel, response: Response):
+    try:
+        user = update_user(pk, data)
+    except HTTPException as e:
+        response.status_code = e.status_code
+        return e.detail
     return UpdateUserResponseModelORM.from_orm(user)
 
 
