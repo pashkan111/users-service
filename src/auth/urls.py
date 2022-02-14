@@ -50,12 +50,14 @@ async def route_login(data: LoginSchema):
 
 
 @router.post('/register')
-def route_register(data: LoginSchema):
+def route_register(response: Response, data: LoginSchema):
     """Route for register users"""
     
     user = register_user(data)
     if user:
+        response.status_code = status.HTTP_200_OK
         return {"login": user.login}
+    response.status_code = status.HTTP_403_FORBIDDEN
     return {"message": "user with such login already exists"}
 
 
