@@ -1,6 +1,8 @@
 from db.db import session
 from .models import AuthUser
-from .schemas import UsersListSchemaORM, UpdateUserModel, PrivateCreateUserSchemaORM, PrivateCreateUserSchema, PrivateDetailUserResponseModelORM, PrivateUpdateUserModelORM
+from .schemas import (
+    UsersListSchemaORM, UpdateUserModel, PrivateCreateUserSchemaORM, PrivateCreateUserSchema, PrivateDetailUserResponseModelORM, PrivateUpdateUserModelORM
+    )
 from typing import List
 from fastapi import Depends, HTTPException
 from starlette import status 

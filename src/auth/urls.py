@@ -1,14 +1,13 @@
 from typing import Optional
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from fastapi import APIRouter
-from pydantic import BaseModel
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, HTTPException
 from starlette import status
-from starlette.responses import RedirectResponse, Response, JSONResponse
+from starlette.responses import Response
 from starlette.requests import Request
 from .schemas import (
-    LoginSchema, UserSchema, UsersListSchema, UpdateUserModel, UpdateUserResponseModelORM, PrivateCreateUserSchema
+    LoginSchema, UsersListSchema, UpdateUserModel, UpdateUserResponseModelORM, PrivateCreateUserSchema
     )
 from .auth_backend import (
     authenticate_user, 

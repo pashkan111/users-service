@@ -10,13 +10,8 @@ from passlib.context import CryptContext
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
 from .schemas import (
-    LoginSchema, TokenData, LoginSchemaORM, UserSchemaORM, UserSchema
+    LoginSchema, TokenData, LoginSchemaORM, UserSchemaORM
     )
-# from configs import (
-#     SECRET_KEY,
-#     ALGORITHM,
-#     ACCESS_TOKEN_EXPIRE_MINUTES
-# )
 from .models import AuthUser
 
 

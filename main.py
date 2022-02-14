@@ -1,7 +1,5 @@
 from fastapi import FastAPI
 import uvicorn
-from starlette.requests import Request
-from starlette.responses import Response
 from src.auth.urls import router
 
 
