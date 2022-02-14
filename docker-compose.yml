@@ -12,3 +12,13 @@ services:
       - ./volumes/postgresql/pg-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  web:
+    build: .
+    command: bash -c "alembic revision --autogenerate -m "commit" && alembic upgrade head && python main.py"
+    volumes:
+      - .:/src
+    ports:
+      - "8000:8089"
+    depends_on:
+      - db1
